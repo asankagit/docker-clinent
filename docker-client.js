@@ -29,11 +29,13 @@ const get = () => {
   console.log("get is calling")
   new Promise((resolve, reject) => {
     docker.container
-      // .create({
-      //   Image: 'asanka/node-web-app',
-      //   name: `${new Date().getTime()}-node-client`,
+      .create({
+        Image: 'asanka/node-web-app',
+        name: `${new Date().getTime()}-node-client`,
 
-      // })
+      })
+
+    docker.container
       .list()
       .then(container => container[0].start())
       .then(container => {
