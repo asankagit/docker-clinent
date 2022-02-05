@@ -25,24 +25,36 @@ const list = () => docker.container.list()
     stream.on('error', reject)
   })
 
-  const get = () => docker.container.create({
-    Image: 'asanka/node-web-app',
-    name: ''
-  })
-    .then(container => container.start())
-    .then(container => {
-      const _container = container
-      return container.exec.create({
-        AttachStdout: true,
-        AttachStderr: true,
-        Cmd: [ "curl", "http://localhost:8080" ]
+const get = () => {
+  console.log("get is calling")
+  new Promise((resolve, reject) => {
+    docker.container
+      // .create({
+      //   Image: 'asanka/node-web-app',
+      //   name: `${new Date().getTime()}-node-client`,
+
+      // })
+      .list()
+      .then(container => container[0].start())
+      .then(container => {
+        const _container = container
+        return container.exec.create({
+          AttachStdout: true,
+          AttachStderr: true,
+          Cmd: ["curl", "http://localhost:8080"]
+        })
       })
-    })
-    .then(exec => {
-      return exec.start({ Detach: false })
-    })
-    .then(stream => promisifyStream(stream))
-    .catch(error => console.log(error));
+      .then(exec => {
+        return exec.start({ Detach: false })
+      })
+      .then(stream => resolve(promisifyStream(stream)))
+      .catch(error => {
+        console.log(error)
+        reject(error)
+      });
+  })
+
+}
 
 
 
@@ -51,7 +63,7 @@ const express  = require('express')
 
 
 // Constants
-const PORT = 8080;
+const PORT = 8081;
 const HOST = '0.0.0.0';
 
 // App
